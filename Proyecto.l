@@ -21,15 +21,6 @@ while		{
 [a-zA-z]+ {
 	printf("%s:Palabras no Reservadas\n",yytext);
 };
-[+|-]?[0-9 ]+ {
-         printf("%s : Numero entero", yytext); 
-         };
-[+|-]?[0-9 ]*[.][0-9]+  {
-        printf("%s : Numero decimal", yytext);
-        };
-[+|-]?[l0-9 ]+[.]?[0-9]+[e][+|-]?[0-9 ]*[.][0-9]+  { 
-        printf ("%s : Numero notacion cientifi", yytext);
-        };
 %%
 int main(int argc, char** argv){
 	int s;
