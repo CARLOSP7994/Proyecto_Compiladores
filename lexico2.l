@@ -1,6 +1,7 @@
 %{
 /* Necesita esto para la llamada a atof () abajo */
 #include <math.h>
+#include "gramatico.tab.h"
 %}
 
 DIGIT    [0-9]
@@ -16,14 +17,16 @@ String   [a-zA-Z0-9]*
 {DIGIT}+"."{DIGIT}*                         {
                                                 return flotante;
                                             }
-int|float|double|
-bool|String|char                            {
-                                                return tipoD;
+int|char                                    {
+                                               return tipoD;
                                             }
 
-if|else
+if
                                             {
-                                                return desicion
+                                                return desicionI;
+                                            }
+else                                        {
+                                                return desicionE;
                                             }
 
 "["|"{"|"("                                 {
@@ -33,7 +36,7 @@ if|else
                                                 return agrupC;
                                             }
 
-while|for                                   {
+while                                       {
                                                 return bucle;
                                             }
 
@@ -45,14 +48,13 @@ while|for                                   {
 ";"                                             return sTerminal; 
 
    
-
-[ \t\n]+ / * omite el espacio en blanco * /          
-
-.           printf( "Caracter no especificado: %s\n", yytext );
-
+"=="                                        {
+                                                return Ologico;
+					    }
+"="                                         {
+						return asg;
+					    }
+\n       				    {
+                                               return('\n');
+         		                    }	                  
 %%
-
-main( argc, argv )
-{
-    yylex()
-}
