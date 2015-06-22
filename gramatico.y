@@ -9,57 +9,66 @@
 %token entero flotante tipoD agrupA agrupC variable
 %token operador sTerminal asg Comparacion Reservada
 %%
-recursiva : texto
-      | recursiva texto;
-texto : '\n'
-      | bloquecodigo {printf("%s >>Frase correcta\n",yytext);}
-      | error    { yyerrok;  }
-bloquecodigo : Tdato
-             | Dfuncion
-             | EstructuraWh
-             | Asignacion
-             | Oaritmetica
-             | DesicionC
-
+recursiva :   texto
+            | recursiva texto
+;
+texto :     	 '\n'
+		| bloquecodigo '\n' {printf(" >>Frase correcta\n");}
+        /* | error    { yyerrok;  }*/
+;
+bloquecodigo :  Tdato
+              | Dfuncion
+              | EstructuraWh
+              | Asignacion
+              | Oaritmetica
+              | DesicionC
+;
 Tdato :  tipoD variable sTerminal 
-
+;
 Argumento : tipoD variable
-
-Dfuncion : variable agrupA agrupC  
-	  | variable agrupA Argumento  agrupC 
-
+;
+Dfuncion :  variable agrupA agrupC  
+	   | variable agrupA Argumento  agrupC 
+;
 condicion : variable Comparacion variable
- 
-EstructuraWh :   Reservada agrupA condicion agrupC 
+; 
+EstructuraWh :  Reservada agrupA condicion agrupC 
               | Reservada agrupA variable agrupC   
 
-
+;
 Oaritmetica : variable operador variable sTerminal
             | variable operador entero sTerminal
             | variable operador flotante sTerminal
-
+;
 DesicionC : Reservada agrupA condicion agrupC Oaritmetica Reservada Oaritmetica
-
+;
 Asignacion :  variable asg flotante sTerminal
 ;
 %%
-int main() {
-FILE *fp= fopen("ejemplo.txt","tr");
-if (!fp)
+/*int main(int argc,char **argv)
 {
-printf("No se puede abrir el archivo");
-return -1;
-}
-   yyin=fp;
-do {
-   yyparse();
-}while (!feof(yyin));
-}
+	
+	if (argc>1)
+		yyin=fopen(argv[1],"rt");
+	else
+		//yyin=stdin;
+		yyin=fopen("ejemplo.txt","rt");
+		
+
+	yyparse();
+	return 0;
+}*/
+main( argc, argv )
+int argc;
+char **argv;
+   {
+   ++argv, --argc; 
+   if ( argc > 0 )
+            yyin = fopen( argv[0], "r" );
+    else
+            yyin = stdin;
+
+    yyparse();
+    }
 
 yyerror (char *s)
-{
-  extern int yylineno;
-  printf ("%s\n", s);
-  printf ("Linea actual: %d\n",yylineno);
-}
-
