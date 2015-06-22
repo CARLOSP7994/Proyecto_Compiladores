@@ -1,3 +1,5 @@
+%option yylineno
+%option noyywrap
 %{
 /* Necesita esto para la llamada a atof () abajo */
 #include <math.h>
@@ -17,18 +19,17 @@ String   [a-zA-Z0-9]*
 {DIGIT}+"."{DIGIT}*                         {
                                                 return flotante;
                                             }
-int|char                                    {
+int |
+char                                    {
                                                return tipoD;
                                             }
-
-if
-                                            {
-                                                return desicionI;
-                                            }
-else                                        {
-                                                return desicionE;
-                                            }
-
+if |
+then |
+else |
+while |
+do  					    {
+					       return  Reservada;
+					    }
 "["|"{"|"("                                 {
                                                 return agrupA;
                                             }
@@ -36,25 +37,26 @@ else                                        {
                                                 return agrupC;
                                             }
 
-while                                       {
-                                                return bucle;
-                                            }
+[A-Za-z]+[A-Za-z0-9\_]*{ID}                 {  return variable;}
+
+"+"|"-"|"*"|"/"                             {  return operador;}
+
+";"                                         {  return sTerminal;} 
 
 
-{ID}                                            return variable;
-
-"+"|"-"|"*"|"/"                                 return operador;
-
-";"                                             return sTerminal; 
-
-   
-"=="                                        {
-                                                return Ologico;
-					    }
+">" |
+"!=" |
+"==" |
+"<=" |
+">=" |
+"<" 					    {
+						return Comparacion;
+                                            }   
 "="                                         {
 						return asg;
 					    }
 \n       				    {
                                                return('\n');
-         		                    }	                  
+         		                    }
+	                  
 %%

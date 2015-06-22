@@ -3,58 +3,63 @@
   #include <stdio.h>
   #define YYSTYPE char*
   extern FILE *yyin;
+  extern char *yytext;
 %}
 
-%token entero flotante tipoD desicionI agrupA agrupC bucle variable
-%token operador desicionE sTerminal Ologico asg
+%token entero flotante tipoD agrupA agrupC variable
+%token operador sTerminal asg Comparacion Reservada
 %%
+recursiva : texto
+      | recursiva texto;
+texto : '\n'
+      | bloquecodigo {printf("%s >>Frase correcta\n",yytext);}
+      | error    { yyerrok;  }
+bloquecodigo : Tdato
+             | Dfuncion
+             | EstructuraWh
+             | Asignacion
+             | Oaritmetica
+             | DesicionC
 
-Ddato :   '\n'
-          |  tipoD variable sTerminal '\n' {printf("\n>>Correcto");}
-;
+Tdato :  tipoD variable sTerminal 
+
 Argumento : tipoD variable
-;
-Dfuncion : '\n'
-          | variable agrupA agrupC  '\n' 
-	  | variable agrupA Argumento  agrupC sTerminal '\n' {printf("\n>>Correcto");}
-;
-condicion : variable Ologico variable
-; 
-EstruturaWh : '\n' 
-	     |  bucle agrupA condicion agrupC '\n'
-             | bucle agrupA variable agrupC   '\n'
-;
-DesicionS :  desicionI agrupA condicion agrupC
-;
-Oaritmetica : variable operador variable
-            | variable operador entero
-            | variable operador flotante
-;
-DesicionC : desicionI agrupA condicion agrupC Oaritmetica desicionE Oaritmetica
-;
-Asignacion : '\n'
-            | variable asg flotante '\n'
+
+Dfuncion : variable agrupA agrupC  
+	  | variable agrupA Argumento  agrupC 
+
+condicion : variable Comparacion variable
+ 
+EstructuraWh :   Reservada agrupA condicion agrupC 
+              | Reservada agrupA variable agrupC   
+
+
+Oaritmetica : variable operador variable sTerminal
+            | variable operador entero sTerminal
+            | variable operador flotante sTerminal
+
+DesicionC : Reservada agrupA condicion agrupC Oaritmetica Reservada Oaritmetica
+
+Asignacion :  variable asg flotante sTerminal
 ;
 %%
-int main(int argc,char **argv)
+int main() {
+FILE *fp= fopen("ejemplo.txt","tr");
+if (!fp)
 {
-	
-	if (argc>1)
-		yyin=fopen(argv[1],"rt");
-	else
-		//yyin=stdin;
-		yyin=fopen("ejemplo.txt","rt");
-		
-
-	yyparse();
-	return 0;
+printf("No se puede abrir el archivo");
+return -1;
 }
+   yyin=fp;
+do {
+   yyparse();
+}while (!feof(yyin));
+}
+
 yyerror (char *s)
- {
- printf("%s\n ", s);
- }
-int yywrap()
- {
-   return 1;
- }
+{
+  extern int yylineno;
+  printf ("%s\n", s);
+  printf ("Linea actual: %d\n",yylineno);
+}
 
