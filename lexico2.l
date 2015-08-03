@@ -1,62 +1,124 @@
+/*Analizador lexico*/
 %option yylineno
 %option noyywrap
 %{
-/* Necesita esto para la llamada a atof () abajo */
-#include <math.h>
+#include <stdio.h>
+#include<stdlib.h>
 #include "gramatico.tab.h"
 %}
+identificador 		[_a-zA-Z]([_a-zA-Z]|[0-9])*
+ /*Tipos de datos */
+int                                       "int"
+float                                     "float"
+double                                    "double"
+char                                      "char"
+void                                      "void"
 
-DIGIT    [0-9]
-ID       [a-z][a-z0-9]*
-String   [a-zA-Z0-9]*
+ /*Estructuras de control*/
+if	"if"
+while	"while"
+else	"else"
+do	"do"
+for	"for"
+break	"break"
+return	"return"
+ /*Datos(enteros, reales,string,etc)*/
+entero		"("[+-][0-9]+")"|[0-9]+
+real		"("[+-][0-9]+"."[0-9]+")"|[0-9]+"."[0-9]+
+caracter	"'"[a-zA-Z]"'"
 
 %%
 
-{DIGIT}+                                    {
-                                                return entero;
-                                            }
+{char}				{/*yylval.tipo = 1;*/ return CHAR; 	}
+{int}				{/*yylval.tipo = 4;*/ return INT;   } 
+{float}				{/*yylval.tipo = 3;*/ return FLOAT;	}
 
-{DIGIT}+"."{DIGIT}*                         {
-                                                return flotante;
-                                            }
-int |
-char                                    {
-                                               return tipoD;
-                                            }
-if |
-then |
-else |
-while |
-do  					    {
-					       return  Reservada;
-					    }
-"["|"{"|"("                                 {
-                                                return agrupA;
-                                            }
-"]"|"]"|")"                                 {
-                                                return agrupC;
-                                            }
+{double}			{/*yylval.tipo = 2;*/ return DOUBLE;	}
 
-[A-Za-z]+[A-Za-z0-9\_]*{ID}                 {  return variable;}
+{void}				{/*yylval.tipo = 5;*/ return VOID; }
 
-"+"|"-"|"*"|"/"                             {  return operador;}
+{if}				{return IF;		}
 
-";"                                         {  return sTerminal;} 
+{while}				{return WHILE;	}
+
+{else}				{return ELSE;		}
+
+{do}				{return DO;		}
+
+{for}				{return FOR;		}
+
+{break}				{return BREAK;	}
+
+{return}			{return RETURN;	}
 
 
-">" |
-"!=" |
-"==" |
-"<=" |
-">=" |
-"<" 					    {
-						return Comparacion;
-                                            }   
-"="                                         {
-						return asg;
-					    }
-\n       				    {
-                                               return('\n');
-         		                    }
-	                  
+
+{identificador}			{
+					/*int i = 0;
+					for( ;yytext[i] != '\0'; i++) {}
+					i++;*/ /*Espaço para o \0 da String*/
+					//yylval.string = (char*)malloc(i * sizeof(char));
+					//strcpy(yylval.string , yytext);
+					return IDENTIFICADOR;	
+				}
+
+
+
+{entero}			{
+					//yylval.entero = atoi(yytext);
+					return ENTERO; 	
+				}
+
+{real}				{
+					//yylval.real = atof(yytext);
+					return REAL;
+				}
+
+{caracter}			{
+					//yylval.caracter = yytext[1];				
+					return CARACTER;		
+				}
+
+
+"("				{return PARENTESIS_IZQUIERDO;	}
+
+")"				{return PARENTESIS_DERECHO;	}
+
+"{"				{return LLAVE_IZQUIERDA;	}
+
+"}"				{return LLAVE_DERECHA;	}
+
+"+"				{return MAS;	}
+
+"-"				{return MENOS;	}
+
+"*"				{return MULT;	}
+
+"/"				{return DIVISION;	}
+
+"++"				{return INCREMENTO;	}				
+
+"--"				{return DECREMENTO;	}	
+
+">"				{return MAYOR;	}
+
+"<"				{return MENOR;	}
+
+">="				{return MAYOR_IGUAL;	}
+
+"<="				{return MENOR_IGUAL;	}
+
+"=="				{return IGUAL;	}
+
+
+
+"="				{return ATRIBUCION;	}
+
+";"				{return PUNTO_COMA;	}
+
+","				{return COMA;	}
+
+"\n"				{return EOL;}
 %%
+
+ 		
